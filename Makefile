@@ -1,9 +1,11 @@
 NAME= codexion
-FLAGS= -Wall -Wextra -Werror -pthread
+FLAGS= -Wall -Wextra -Werror -pthread -Isrc
 COMPILER= cc
-FILES= $(wildcard *.c)
+SRC_DIR= src
 
-OBJ=$(FILES:.c=.o)
+SRC=$(wildcard $(SRC_DIR)/*.c)
+
+OBJ=$(SRC:.c=.o)
 
 all: $(NAME)
 

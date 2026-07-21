@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/20 22:48:06 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/21 16:17:30 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,18 @@ typedef struct s_coder
 	// unsigned int	time_tburnout;
 	t_dongle	*left;
 	t_dongle	*right;
+	t_system *system;
 }					t_coder;
 
+typedef struct s_system
+{
+	t_coder *coders;
+	t_dongle *dongles;
+	t_config config;
+	pthread_mutex_t mutex;
+	unsigned int starting_time;
+	
+}	t_system;
 
 int					ft_check_args(char **arv, int count);
 int					ft_parsing(int arc, char **arv);

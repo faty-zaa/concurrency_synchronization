@@ -13,6 +13,11 @@ Mastering concurrent programming in C through multithreading, synchronization, s
 
     <The stack> is used to manage function calls and local variables. Each time a function is called, a stack frame is created, which stores the function’s local variables, parameters, and return address. When the function finishes, its stack frame is removed, following the LIFO principle.
 
+# P_thread
+    Stands for POSIX THREAD
+    is a C library that allowed us the create multiples threads
+
+
 Phase 1: Project skeleton
 Phase 2: Argument parser
 Phase 3: Initialization

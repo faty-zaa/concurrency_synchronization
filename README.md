@@ -16,7 +16,20 @@ Mastering concurrent programming in C through multithreading, synchronization, s
 # P_thread
     Stands for POSIX THREAD
     is a C library that allowed us the create multiples threads
+    The thread argument points to a buffer of type pthread_t into which the unique identifier for this thread is copied before pthread_create() returns. This identifier can be used in later Pthreads calls to refer to the thread.
+    The pthread_exit() function terminates the calling thread, and specifies a return value that can be obtained in another thread by calling pthread_join().
+    The key difference between threads and processes is the easier sharing of information that threads provide, and this is the main reason that some application designs map better onto a multithread design than onto a multiprocess design.
 
+    *terminated thread*: we must ensure that a normally terminating thread does not return an integer whose value matches PTHREAD_CANCELED on that Pthreads implementation.
+
+# Mutex
+    pthread_mutex_init() fills the memory occupied by the pthread_mutex_t object with whatever internal data the pthread library needs to make it a valid mutex
+    When an automatically or dynamically allocated mutex is no longer required, it should be destroyed using pthread_mutex_destroy()
+    It is safe to destroy a mutex only when it is unlocked, and no thread will subsequently try to lock it
+    An automatically allocated mutex should be destroyed before its host function returns
+    A mutex that has been destroyed with pthread_mutex_destroy() can subsequently be reinitialized by pthread_mutex_init()
+
+    
 
 Phase 1: Project skeleton
 Phase 2: Argument parser

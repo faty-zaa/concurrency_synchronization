@@ -1,24 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   creat_threads.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/12 10:42:01 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/25 15:08:15 by falamlih         ###   ########.fr       */
+/*   Created: 2026/07/22 19:01:01 by falamlih          #+#    #+#             */
+/*   Updated: 2026/07/25 19:06:16 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
-int	main(int arc, char **arv)
+void	creat_coders(t_system *system)
 {
-	if (!ft_parsing(arc, arv))
-		return (0);
-	t_system system;
-	t_config config = ft_get_config(arv);
-	init_system(&system, &config);
-	creat_coders(&system);
-	join_threads(&system);
+	unsigned int i;
+
+	i = 0;
+	while (i < system->config.n_coders)
+	{
+		pthread_create(&system->coders[i].thread, NULL, simulation,
+			&system->coders[i]);
+		i++;
+	}
 }

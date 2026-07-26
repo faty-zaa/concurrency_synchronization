@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 10:42:01 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/25 15:08:15 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/26 16:56:56 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,4 +21,5 @@ int	main(int arc, char **arv)
 	init_system(&system, &config);
 	creat_coders(&system);
 	join_threads(&system);
+	return 0;
 }

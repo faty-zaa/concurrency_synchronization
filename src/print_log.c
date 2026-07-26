@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/25 19:05:40 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/26 16:53:51 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 void	take_dongles(t_coder *coder)
 {
 	printf("%ld %d has taken a dongle\n", coder->last_compile, coder->coder_id);
-	// pthread_mutex_lock(&coder->left->mutex_dongle);
+	pthread_mutex_lock(&coder->left->mutex_dongle);
 	printf("%ld %d has taken a dongle\n", coder->last_compile, coder->coder_id);
-	// pthread_mutex_lock(&coder->right->mutex_dongle);
+	pthread_mutex_lock(&coder->right->mutex_dongle);
 }
 
 void	relase_dongles(t_coder *coder)

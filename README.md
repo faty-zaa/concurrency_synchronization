@@ -42,4 +42,32 @@ Phase 8: Dongles
 Phase 9: Scheduler (FIFO)
 Phase 10: Scheduler (EDF)
 Phase 11: Monitor
-Phase 12: Cleanup
+Phase 12: Cleanup\
+
+Process
+
+│
+
+├── Machine instructions
+
+├── Heap
+
+├── Stack
+
+├── Global variables
+
+├── Open files
+
+├── Environment variables
+
+├── File descriptors
+
+├── Registers
+
+└── One thread (initially)
+
+
+concurrency: one thread swich between tasks
+parallelism: multi cores has multi threads that excute at the smae time
+
+If all threads only read the data and nobody modifies it, there is no race condition. The problem appears when one or more threads can write to shared data while others access it.

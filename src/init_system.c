@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:17 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/25 01:38:22 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/26 19:38:07 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,14 @@ void	init_system(t_system *system, t_config *config)
 	while (i < system->config.n_coders)
 	{
 		system->coders[i].coder_id = i;
+		system->coders[i].compile_count = 0;
 		system->coders[i].system = system;
+		system->coders[i].left = &system->dongles[i];
+		if ((i + 1) == config->n_coders)
+			system->coders[i].right = &system->dongles[0];
+		else
+			system->coders[i].right = &system->dongles[i + 1];
 		i++;
 	}
 }
+

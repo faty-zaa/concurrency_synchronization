@@ -1,27 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   simulation.c                                       :+:      :+:    :+:   */
+/*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/22 19:00:51 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/26 17:16:14 by falamlih         ###   ########.fr       */
+/*   Created: 2026/07/26 17:24:08 by falamlih          #+#    #+#             */
+/*   Updated: 2026/07/26 17:24:19 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
-
-void	*simulation(void *arg)
-{
-	t_coder	*coder;
-
-	coder = (t_coder *)arg;
-	take_dongles(coder);
-	compiling(coder);
-	relase_dongles(coder);
-	refactoring(coder);
-	debugging(coder);
-		// burnout(coder);
-		return (NULL);
-}

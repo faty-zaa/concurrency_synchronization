@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 17:00:38 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/25 01:31:29 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/30 23:40:26 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 void	join_threads(t_system *system)
 {
-    unsigned int  i;
+	unsigned int	i;
 
 	i = 0;
+	pthread_join(system->monitor_thread, NULL);
 	while (i < system->config.n_coders)
 	{
 		pthread_join(system->coders[i].thread, NULL);

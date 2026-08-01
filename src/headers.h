@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/01 05:31:11 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 16:54:46 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,10 @@ typedef struct s_config
 typedef struct s_dongle
 {
 	pthread_mutex_t		mutex_dongle;
-	unsigned int		cooldown;
+	pthread_cond_t		cond_dongle;
+	unsigned int		released_time;
 	unsigned int		id;
+	int					is_avai;
 
 }						t_dongle;
 
@@ -109,7 +111,7 @@ void					creat_coders(t_system *system);
 void					init_system(t_system *system, t_config *config);
 void					join_threads(t_system *system);
 long					get_time_ms(void);
-void					take_dongles(t_coder *coder);
+int						take_dongles(t_coder *coder);
 void					compiling(t_coder *coder);
 void					refactoring(t_coder *coder);
 void					debugging(t_coder *coder);

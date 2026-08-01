@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/29 02:09:31 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/30 18:12:37 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/31 17:47:44 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 void	queue_init(t_queue *queue, int capacity)
 {
 	queue->array = malloc(sizeof(t_coder *) * capacity);
+	if (!queue->array)
+	{
+		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES, system and destroy the heap
+		return ;
+	}
 	queue->size = 0;
 	queue->capacity = capacity;
 }

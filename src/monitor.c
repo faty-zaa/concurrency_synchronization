@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/26 17:24:08 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 01:26:15 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 06:12:49 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	*monitor(void *args)
 	long			burnouted;
 
 	system = (t_system *)args;
-	while (!system->stop)
+	while (!system_is_stopped(system))
 	{
 		i = 0;
 		while (i < system->config.n_coders)
@@ -27,10 +27,13 @@ void	*monitor(void *args)
 			pthread_mutex_lock(&system->coders[i].mutex_coder);
 			burnouted = system->coders[i].last_compile;
 			pthread_mutex_unlock(&system->coders[i].mutex_coder);
-			if (count_burnout(burnouted) >= system->config.t_burnout)
+			if (count_burnout(burnouted) >= system->config.t_burnout
+				&& system->coders[i].compile_count < system->config.compiles_required)
 			{
-				system->stop = true;
+				system_stop(system);
+				pthread_mutex_lock(&system->schedule.mutex);
 				pthread_cond_broadcast(&system->schedule.cond);
+				pthread_mutex_unlock(&system->schedule.mutex);
 				burnout(&system->coders[i]);
 				break ;
 			}

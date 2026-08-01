@@ -6,11 +6,28 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:17 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 01:13:05 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 05:40:29 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
+
+void	system_stop(t_system *system)
+{
+	pthread_mutex_lock(&system->stop_mutex);
+	system->stop = true;
+	pthread_mutex_unlock(&system->stop_mutex);
+}
+
+bool	system_is_stopped(t_system *system)
+{
+	bool	stopped;
+
+	pthread_mutex_lock(&system->stop_mutex);
+	stopped = system->stop;
+	pthread_mutex_unlock(&system->stop_mutex);
+	return (stopped);
+}
 
 void	init_system(t_system *system, t_config *config)
 {
@@ -34,22 +51,35 @@ void	init_system(t_system *system, t_config *config)
 	while (i < system->config.n_coders)
 	{
 		system->dongles[i].id = i;
-		pthread_mutex_init(&system->dongles[i].mutex_dongle, NULL);
+		if (pthread_mutex_init(&system->dongles[i].mutex_dongle, NULL) != 0)
+		{
+			printf("mutex init of dongles fails\n");
+			return ;
+		}
 		i++;
 	}
-	pthread_mutex_init(&system->print_mutex, NULL);
+	if (pthread_mutex_init(&system->print_mutex, NULL) != 0
+		|| pthread_mutex_init(&system->stop_mutex, NULL) != 0)
+	{
+		printf("mutex init fails\n");
+		return ;
+	}
 	system->starting_time = get_time_ms();
 	i = 0;
 	while (i < system->config.n_coders)
 	{
-		system->coders[i].coder_id = i;
+		system->coders[i].coder_id = i + 1;
 		system->coders[i].compile_count = 0;
 		system->coders[i].last_compile = system->starting_time;
 		system->coders[i].system = system;
 		system->coders[i].deadline = 0;
 		system->coders[i].state = 0;
 		system->coders[i].left = &system->dongles[i];
-		pthread_mutex_init(&system->coders[i].mutex_coder, NULL);
+		if (pthread_mutex_init(&system->coders[i].mutex_coder, NULL) != 0)
+		{
+			printf("mutex init of coder %d fails\n", i);
+			return ;
+		}
 		if ((i + 1) == config->n_coders)
 			system->coders[i].right = &system->dongles[0];
 		else
@@ -59,7 +89,8 @@ void	init_system(t_system *system, t_config *config)
 	system->scheduler = config->scheduler;
 	system->stop = false;
 	scheduler_init(&system->schedule, 15, config->scheduler);
+	// should check if fails inside by making somthing returned
 	creat_coders(system);
-	pthread_create(&system->monitor_thread, NULL,
-			monitor, system);
+	// should check if fails inside by making somthing returned
+	pthread_create(&system->monitor_thread, NULL, monitor, system);
 }

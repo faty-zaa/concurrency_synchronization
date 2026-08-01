@@ -71,3 +71,5 @@ concurrency: one thread swich between tasks
 parallelism: multi cores has multi threads that excute at the smae time
 
 If all threads only read the data and nobody modifies it, there is no race condition. The problem appears when one or more threads can write to shared data while others access it.
+
+cond_wait unlock the mutex taken before

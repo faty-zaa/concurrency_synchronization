@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:34 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/30 18:13:09 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/07/31 17:45:52 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,12 @@
 
 void	heap_init(t_heap *heap, int capacity)
 {
-	heap->array = malloc(sizeof(t_coder) * capacity);
+	heap->array = malloc(sizeof(t_coder *) * capacity);
+	if (!heap->array)
+	{
+		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES, SYSTEM
+		return ;
+	}
 	heap->size = 0;
 	heap->capacity = capacity;
 }

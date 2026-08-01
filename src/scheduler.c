@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/28 17:17:58 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 01:18:09 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 05:55:38 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,21 @@ void	scheduler_init(t_scheduler *scheduler, int capacity, char *algo)
 	scheduler->current = NULL;
 	scheduler->algo = algo;
 	pthread_mutex_init(&scheduler->mutex, NULL);
+	if (pthread_mutex_init(&scheduler->mutex, NULL) != 0)
+	{
+		printf("mutex of scheduler fails\n");
+		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES,
+		// system and destroy the heap and the queue
+		return ;
+	}
 	pthread_cond_init(&scheduler->cond, NULL);
+	if (pthread_cond_init(&scheduler->cond, NULL) != 0)
+	{
+		printf("cond_wait_init fails\n");
+		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES,
+		// system and destroy the heap and the queue and scheduler init mutex
+		return ;
+	}
 }
 
 void	request_scheduler(t_scheduler *scheduler, t_coder *coder)
@@ -34,7 +48,7 @@ void	request_scheduler(t_scheduler *scheduler, t_coder *coder)
 		scheduler->current = scheduler_next(scheduler);
 		pthread_cond_broadcast(&scheduler->cond);
 	}
-	while (scheduler->current != coder && !coder->system->stop)
+	while (scheduler->current != coder && !system_is_stopped(coder->system))
 		pthread_cond_wait(&scheduler->cond, &scheduler->mutex);
 	pthread_mutex_unlock(&scheduler->mutex);
 }

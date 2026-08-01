@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 01:22:21 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 06:32:08 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,36 @@ void	log_print(t_coder *coder, const char *msg)
 
 void	take_dongles(t_coder *coder)
 {
-	pthread_mutex_lock(&coder->left->mutex_dongle);
+	t_dongle	*first;
+	t_dongle	*second;
+
+	first = coder->left;
+	second = coder->right;
+	if (first->id > second->id)
+	{
+		first = coder->right;
+		second = coder->left;
+	}
+	pthread_mutex_lock(&first->mutex_dongle);
 	log_print(coder, "has taken a dongle");
-	pthread_mutex_lock(&coder->right->mutex_dongle);
+	pthread_mutex_lock(&second->mutex_dongle);
 	log_print(coder, "has taken a dongle");
 }
 
 void	relase_dongles(t_coder *coder)
 {
-	pthread_mutex_unlock(&coder->left->mutex_dongle);
-	pthread_mutex_unlock(&coder->right->mutex_dongle);
+	t_dongle	*first;
+	t_dongle	*second;
+
+	first = coder->left;
+	second = coder->right;
+	if (first->id > second->id)
+	{
+		first = coder->right;
+		second = coder->left;
+	}
+	pthread_mutex_unlock(&second->mutex_dongle);
+	pthread_mutex_unlock(&first->mutex_dongle);
 }
 
 void	compiling(t_coder *coder)
@@ -38,6 +58,7 @@ void	compiling(t_coder *coder)
 	log_print(coder, "is compiling");
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->last_compile = get_time_ms();
+	coder->deadline = coder->last_compile + coder->system->config.t_burnout;
 	pthread_mutex_unlock(&coder->mutex_coder);
 	usleep(coder->system->config.t_compile * 1000);
 	pthread_mutex_lock(&coder->mutex_coder);

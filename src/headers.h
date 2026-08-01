@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 01:26:41 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/01 05:31:11 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ typedef struct s_system
 	pthread_mutex_t		print_mutex;
 	long				starting_time;
 	bool				stop;
+	pthread_mutex_t stop_mutex;
 	char				*scheduler;
 	t_scheduler			schedule;
 
@@ -133,7 +134,7 @@ void					scheduler_init(t_scheduler *scheduler, int capacity,
 							char *algo);
 void					scheduler_release(t_scheduler *scheduler);
 long					get_time(t_system *system);
-long					count_burnout(long last);
-void	burnout(t_coder *coder);
+long					count_burnout(long last);void						system_stop(t_system *system);
+bool						system_is_stopped(t_system *system);void	burnout(t_coder *coder);
 
 #endif

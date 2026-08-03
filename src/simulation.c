@@ -6,37 +6,61 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:51 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/01 16:38:48 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/03 06:08:08 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
+unsigned int	coder_compiles(t_coder *coder)
+{
+	unsigned int	count;
+
+	pthread_mutex_lock(&coder->mutex_coder);
+	count = coder->compile_count;
+	pthread_mutex_unlock(&coder->mutex_coder);
+	return (count);
+}
+
+bool	all_coders_compile(t_system *system)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (i < system->config.n_coders)
+	{
+		if (coder_compiles(&system->coders[i]) < system->config.compiles_required)
+			return (false);
+		i++;
+	}
+	return (true);
+}
 void	*simulation(void *arg)
 {
-	t_coder *coder;
+	t_coder	*coder;
 
 	coder = (t_coder *)arg;
-	while (!system_is_stopped(coder->system))
+	while (!system_is_stopped(coder->system)
+		&& !all_coders_compile(coder->system))
 	{
-		request_scheduler(&coder->system->schedule, coder);
+		if (all_coders_compile(coder->system))
+		{
+			printf("simulation ends");
+			exit(1);
+		}
 		if (system_is_stopped(coder->system))
 			break ;
-		if(take_dongles(coder))
-			break ;
+		take_dongles(coder);
 		if (system_is_stopped(coder->system))
 		{
 			relase_dongles(coder);
-			scheduler_release(&coder->system->schedule);
 			break ;
 		}
 		compiling(coder);
 		if (system_is_stopped(coder->system))
 		{
-			scheduler_release(&coder->system->schedule);
 			break ;
 		}
-		scheduler_release(&coder->system->schedule);
 		if (system_is_stopped(coder->system))
 			break ;
 		debugging(coder);

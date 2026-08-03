@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:17 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/01 16:55:31 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/03 06:34:49 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,14 @@ void	init_system(t_system *system, t_config *config)
 			printf("cond init of dongles fails\n");
 			return ;
 		}
-		system->dongles[i].is_avai = 1;
 		system->dongles[i].released_time = 0;
+		system->dongles[i].algo = system->config.scheduler;
+		system->dongles[i].current = NULL;
+		system->dongles[i].state = false;
+		if (strcmp(system->dongles[i].algo, "edf") == 0)
+			heap_init(&system->dongles[i].edf, 2);
+		else if (strcmp(system->dongles[i].algo, "fifo") == 0)
+			queue_init(&system->dongles[i].fifo, 2);
 		i++;
 	}
 	if (pthread_mutex_init(&system->print_mutex, NULL) != 0
@@ -81,6 +87,7 @@ void	init_system(t_system *system, t_config *config)
 		system->coders[i].system = system;
 		system->coders[i].deadline = 0;
 		system->coders[i].state = 0;
+		system->coders[i].waiting = false;
 		system->coders[i].left = &system->dongles[i];
 		if (pthread_mutex_init(&system->coders[i].mutex_coder, NULL) != 0)
 		{
@@ -95,7 +102,6 @@ void	init_system(t_system *system, t_config *config)
 	}
 	system->scheduler = config->scheduler;
 	system->stop = false;
-	scheduler_init(&system->schedule, config->n_coders, config->scheduler);
 	// should check if fails inside by making somthing returned
 	creat_coders(system);
 	// should check if fails inside by making somthing returned

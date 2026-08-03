@@ -24,6 +24,16 @@ void	queue_init(t_queue *queue, int capacity)
 	queue->capacity = capacity;
 }
 
+void	queue_destroy(t_queue *queue)
+{
+	if (!queue)
+		return ;
+	free(queue->array);
+	queue->array = NULL;
+	queue->size = 0;
+	queue->capacity = 0;
+}
+
 void	fifo_enqueue(t_queue *queue, t_coder *coder)
 {
 	if (queue->size == queue->capacity)

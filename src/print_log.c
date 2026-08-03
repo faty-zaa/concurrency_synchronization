@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/01 17:29:55 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/03 06:12:17 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,39 @@ void	log_print(t_coder *coder, const char *msg)
 	pthread_mutex_unlock(&coder->system->print_mutex);
 }
 
-int	take_dongles(t_coder *coder)
+void	take_dongle(t_dongle *dongle, t_coder *coder)
+{
+	pthread_mutex_lock(&dongle->mutex_dongle);
+	if (coder_compiles(coder) >= coder->system->config.compiles_required)
+		return ;
+	if (strcmp(coder->system->scheduler, "fifo") == 0)
+		fifo_enqueue(&dongle->fifo, coder);
+	else if (strcmp(coder->system->scheduler, "edf") == 0)
+		heap_insert(&dongle->edf, coder);
+	if (dongle->current == NULL)
+	{
+		if (strcmp(coder->system->scheduler, "fifo") == 0)
+			dongle->current = fifo_deque(&dongle->fifo);
+		else
+			dongle->current = heap_pop(&dongle->edf);
+		pthread_cond_broadcast(&dongle->cond_dongle);
+	}
+	while (dongle->current != coder)
+		pthread_cond_wait(&dongle->cond_dongle, &dongle->mutex_dongle);
+	log_print(coder, "has taken a dongle");
+}
+
+void	relase_dongle(t_dongle *dongle)
+{
+	if (strcmp(dongle->algo, "fifo") == 0)
+		dongle->current = fifo_deque(&dongle->fifo);
+	else if (strcmp(dongle->algo, "edf") == 0)
+		dongle->current = heap_pop(&dongle->edf);
+	pthread_cond_broadcast(&dongle->cond_dongle);
+	pthread_mutex_unlock(&dongle->mutex_dongle);
+}
+
+void	take_dongles(t_coder *coder)
 {
 	t_dongle	*first;
 	t_dongle	*second;
@@ -31,32 +63,9 @@ int	take_dongles(t_coder *coder)
 		first = coder->right;
 		second = coder->left;
 	}
-	pthread_mutex_lock(&first->mutex_dongle);
-	if (first->is_avai)
-		log_print(coder, "has taken a dongle");
-	else
-		pthread_cond_wait(&first->cond_dongle, &first->mutex_dongle);
-	// while (get_time_ms()
-	// 	- first->released_time < coder->system->config.dongle_cooldown)
-	// 	usleep(1000);
-	first->is_avai = 0;
-	if (coder->system->stop)
-		return (pthread_mutex_unlock(&first->mutex_dongle), 1);
-	pthread_mutex_lock(&second->mutex_dongle);
-	if (second->is_avai)
-		log_print(coder, "has taken a dongle");
-	else 
-		pthread_cond_wait(&second->cond_dongle, &second->mutex_dongle);
-	// while (get_time_ms()
-	// 	- second->released_time < coder->system->config.dongle_cooldown)
-	// 	usleep(1000);
-	second->is_avai = 0;
-	if (coder->system->stop)
-		return (pthread_mutex_unlock(&first->mutex_dongle),
-			pthread_mutex_unlock(&second->mutex_dongle), 1);
-	return (0);
+	take_dongle(first, coder);
+	take_dongle(second, coder);
 }
-
 void	relase_dongles(t_coder *coder)
 {
 	t_dongle	*first;
@@ -69,14 +78,9 @@ void	relase_dongles(t_coder *coder)
 		first = coder->right;
 		second = coder->left;
 	}
-	// first->released_time = get_time_ms();
-	// second->released_time = get_time_ms();
-	first->is_avai = 1;
-	second->is_avai = 1;
-	pthread_mutex_unlock(&second->mutex_dongle);
-	pthread_mutex_unlock(&first->mutex_dongle);
+	relase_dongle(first);
+	relase_dongle(second);
 }
-
 void	compiling(t_coder *coder)
 {
 	log_print(coder, "is compiling");

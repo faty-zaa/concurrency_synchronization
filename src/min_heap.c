@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:34 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/31 17:45:52 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/03 06:16:32 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void	heap_init(t_heap *heap, int capacity)
 	heap->array = malloc(sizeof(t_coder *) * capacity);
 	if (!heap->array)
 	{
-		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES, SYSTEM
+		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES,
+		// SYSTEM
 		return ;
 	}
 	heap->size = 0;
@@ -71,12 +72,13 @@ t_coder	*heap_pop(t_heap *heap)
 		return (NULL);
 	coder = heap->array[0];
 	heap->size--;
+	heap->array[0] = heap->array[heap->size];
 	i = 0;
+	small = i;
 	while (1)
 	{
 		left = 2 * i + 1;
 		right = 2 * i + 2;
-		small = i;
 		if (left < heap->size
 			&& deadline(heap->array[left]) < deadline(heap->array[small]))
 			small = left;

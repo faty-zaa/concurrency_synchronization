@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:51 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/03 06:08:08 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/04 06:34:33 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,6 @@ void	*simulation(void *arg)
 	while (!system_is_stopped(coder->system)
 		&& !all_coders_compile(coder->system))
 	{
-		if (all_coders_compile(coder->system))
-		{
-			printf("simulation ends");
-			exit(1);
-		}
 		if (system_is_stopped(coder->system))
 			break ;
 		take_dongles(coder);

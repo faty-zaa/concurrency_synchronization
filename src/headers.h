@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/03 06:35:02 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/04 06:22:20 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex_dongle;
 	pthread_cond_t		cond_dongle;
-	unsigned int		released_time;
+	bool		used;
 	unsigned int		id;
 	t_queue				fifo;
 	t_heap				edf;

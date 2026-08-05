@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/04 06:22:20 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/05 04:44:52 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,13 @@ typedef struct s_dongle
 {
 	pthread_mutex_t		mutex_dongle;
 	pthread_cond_t		cond_dongle;
-	bool		used;
 	unsigned int		id;
 	t_queue				fifo;
 	t_heap				edf;
 	t_coder				*current;
 	char				*algo;
 	bool				state;
+	unsigned int released_time;
 
 }						t_dongle;
 
@@ -71,7 +71,6 @@ typedef struct s_system
 	pthread_mutex_t		print_mutex;
 	long				starting_time;
 	bool				stop;
-
 	pthread_mutex_t		stop_mutex;
 	char				*scheduler;
 
@@ -81,8 +80,6 @@ typedef struct s_coder
 {
 	pthread_t			thread;
 	pthread_mutex_t		mutex_coder;
-	int					state;
-	bool				waiting;
 	unsigned int		coder_id;
 	unsigned int		compile_count;
 	long				last_compile;
@@ -90,6 +87,8 @@ typedef struct s_coder
 	t_dongle			*left;
 	t_dongle			*right;
 	t_system			*system;
+	bool				waiting_left;
+	bool				waiting_right;
 }						t_coder;
 
 int						ft_check_args(char **arv, int count);
@@ -99,20 +98,15 @@ long					ft_atoi(const char *nptr);
 char					*ft_tolower(char *c);
 int						ft_isalpha(char *c);
 size_t					ft_isalpha_num(char *c);
-void					*simulation(void *arg);
 void					creat_coders(t_system *system);
 void					init_system(t_system *system, t_config *config);
 void					join_threads(t_system *system);
 void					cleanup_system(t_system *system);
 long					get_time_ms(void);
-void					take_dongle(t_dongle *dongle, t_coder *coder);
-void					compiling(t_coder *coder);
 void					refactoring(t_coder *coder);
 void					debugging(t_coder *coder);
 void					burnout(t_coder *coder);
-void					relase_dongle(t_dongle *dongle);
 long					deadline(t_coder *coder);
-void					*monitor(void *args);
 void					heap_init(t_heap *heap, int capacity);
 void					heap_destroy(t_heap *heap);
 void					heap_insert(t_heap *heap, t_coder *coder);
@@ -126,7 +120,7 @@ long					count_burnout(long last);
 void					system_stop(t_system *system);
 bool					system_is_stopped(t_system *system);
 void					burnout(t_coder *coder);
-unsigned int			coder_compiles(t_coder *coder);
-void					take_dongles(t_coder *coder);
-void	relase_dongles(t_coder *coder);
+void					*simulation(void *args);
+void					*monitor(void *arg);
+
 #endif

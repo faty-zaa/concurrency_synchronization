@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:17 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/04 06:22:05 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/05 04:44:35 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,14 @@ void	init_system(t_system *system, t_config *config)
 			printf("cond init of dongles fails\n");
 			return ;
 		}
-		system->dongles[i].used = false;
 		system->dongles[i].algo = system->config.scheduler;
 		system->dongles[i].current = NULL;
 		system->dongles[i].state = false;
+		system->dongles[i].released_time = 0;
 		if (strcmp(system->dongles[i].algo, "edf") == 0)
-			heap_init(&system->dongles[i].edf, 2);
+			heap_init(&system->dongles[i].edf, system->config.n_coders);
 		else if (strcmp(system->dongles[i].algo, "fifo") == 0)
-			queue_init(&system->dongles[i].fifo, 2);
+			queue_init(&system->dongles[i].fifo, system->config.n_coders);
 		i++;
 	}
 	if (pthread_mutex_init(&system->print_mutex, NULL) != 0
@@ -85,9 +85,9 @@ void	init_system(t_system *system, t_config *config)
 		system->coders[i].compile_count = 0;
 		system->coders[i].last_compile = system->starting_time;
 		system->coders[i].system = system;
-		system->coders[i].deadline = 0;
-		system->coders[i].state = 0;
-		system->coders[i].waiting = false;
+		system->coders[i].deadline = system->config.t_burnout;
+		system->coders[i].waiting_left = false;
+		system->coders[i].waiting_right = false;
 		system->coders[i].left = &system->dongles[i];
 		if (pthread_mutex_init(&system->coders[i].mutex_coder, NULL) != 0)
 		{

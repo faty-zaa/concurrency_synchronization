@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/26 17:24:08 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 05:20:01 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 06:47:18 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,16 @@ bool	check_burnout(t_system *system)
 {
 	unsigned int	i;
 	long			now;
+	unsigned int	count;
 
 	i = 0;
 	while (i < system->config.n_coders)
 	{
 		pthread_mutex_lock(&system->coders[i].mutex_coder);
 		now = get_time_ms() - system->starting_time;
+		count = system->coders[i].compile_count;
 		if (now >= system->coders[i].deadline
-			&& system->coders[i].compile_count < system->config.compiles_required)
+			&& count < system->config.compiles_required)
 		{
 			pthread_mutex_unlock(&system->coders[i].mutex_coder);
 			burnout(&system->coders[i]);
@@ -34,6 +36,7 @@ bool	check_burnout(t_system *system)
 	}
 	return (false);
 }
+
 void	wake_all_dongles(t_system *system)
 {
 	unsigned int	i;
@@ -47,6 +50,7 @@ void	wake_all_dongles(t_system *system)
 		i++;
 	}
 }
+
 unsigned int	coder_compiles(t_coder *coder)
 {
 	unsigned int	count;
@@ -56,19 +60,23 @@ unsigned int	coder_compiles(t_coder *coder)
 	pthread_mutex_unlock(&coder->mutex_coder);
 	return (count);
 }
+
 bool	all_coders_compile(t_system *system)
 {
 	unsigned int	i;
+	unsigned int	count;
 
 	i = 0;
 	while (i < system->config.n_coders)
 	{
-		if (coder_compiles(&system->coders[i]) < system->config.compiles_required)
+		count = system->config.compiles_required;
+		if (coder_compiles(&system->coders[i]) < count)
 			return (false);
 		i++;
 	}
 	return (true);
 }
+
 void	*monitor(void *arg)
 {
 	t_system	*system;

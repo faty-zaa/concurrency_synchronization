@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 04:40:42 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 05:33:25 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,22 +19,31 @@ void	log_print(t_coder *coder, const char *msg)
 	pthread_mutex_unlock(&coder->system->print_mutex);
 }
 
-void	ft_sleep(unsigned int ms, t_coder *coder)
+void	ft_sleep(long ms, t_coder *coder)
 {
-	unsigned int	count;
-
-	count = 0;
-	while (count < ms)
+	while (get_time_ms() < ms)
 	{
 		usleep(1000);
-		count += 1;
 		if (system_is_stopped(coder->system))
 			break ;
 	}
 }
+bool	cooldown_is_done(t_dongle *dg, long col)
+{
+	bool	value;
+
+	pthread_mutex_lock(&dg->mutex_dongle);
+	value = (get_time_ms() > dg->released_time + col);
+	if (dg->released_time == 0)
+		value = true;
+	pthread_mutex_unlock(&dg->mutex_dongle);
+	return (value);
+}
 void	take_dongle(t_dongle *dongle, t_coder *coder, bool *waiting)
 {
 	pthread_mutex_lock(&dongle->mutex_dongle);
+	// if (cooldown_is_done(dongle, coder->system->config.dongle_cooldown))
+	// 	return (false);
 	if (!*waiting)
 	{
 		if (strcmp(coder->system->scheduler, "fifo") == 0)
@@ -61,10 +70,10 @@ void	take_dongle(t_dongle *dongle, t_coder *coder, bool *waiting)
 		pthread_mutex_unlock(&dongle->mutex_dongle);
 	return ;
 }
-void	release_dongle(t_dongle *dongle)
+void	release_dongle(t_dongle *dongle, t_system *system)
 {
 	dongle->current = NULL;
-	dongle->released_time = get_time_ms();
+	dongle->released_time = get_time(system);
 	pthread_cond_broadcast(&dongle->cond_dongle);
 	pthread_mutex_unlock(&dongle->mutex_dongle);
 }
@@ -89,13 +98,13 @@ bool	take_dongles(t_coder *coder)
 		log_print(coder, "has taken a dongle");
 		while (!system_is_stopped(coder->system))
 			pthread_cond_wait(&first->cond_dongle, &first->mutex_dongle);
-		release_dongle(first);
+		release_dongle(first, coder->system);
 		return (false);
 	}
 	take_dongle(second, coder, &coder->waiting_right);
 	if (second->current != coder)
 	{
-		release_dongle(first);
+		release_dongle(first, coder->system);
 		return (false);
 	}
 	log_print(coder, "has taken a dongle");
@@ -110,10 +119,9 @@ void	compiling(t_coder *coder)
 		+ coder->system->config.t_burnout;
 	pthread_mutex_unlock(&coder->mutex_coder);
 	log_print(coder, "is compiling");
-	ft_sleep(coder->system->config.t_compile, coder);
-	ft_sleep(coder->system->config.dongle_cooldown, coder);
-	release_dongle(coder->left);
-	release_dongle(coder->right);
+	ft_sleep(get_time_ms() + coder->system->config.t_compile, coder);
+	release_dongle(coder->left, coder->system);
+	release_dongle(coder->right, coder->system);
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->mutex_coder);
@@ -122,13 +130,13 @@ void	compiling(t_coder *coder)
 void	refactoring(t_coder *coder)
 {
 	log_print(coder, "is refactoring");
-	ft_sleep(coder->system->config.t_refactor, coder);
+	ft_sleep(get_time_ms() + coder->system->config.t_refactor, coder);
 }
 
 void	debugging(t_coder *coder)
 {
 	log_print(coder, "is debugging");
-	ft_sleep(coder->system->config.t_debug, coder);
+	ft_sleep(get_time_ms() + coder->system->config.t_debug, coder);
 }
 
 void	burnout(t_coder *coder)

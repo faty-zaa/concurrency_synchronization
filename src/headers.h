@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 04:22:43 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 05:33:33 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <unistd.h>
 
 typedef struct s_coder	t_coder;
+typedef struct s_system	t_system;
 typedef struct s_heap
 {
 	t_coder				**array;
@@ -44,7 +45,7 @@ typedef struct s_config
 	unsigned int		t_debug;
 	unsigned int		t_refactor;
 	unsigned int		compiles_required;
-	unsigned int		dongle_cooldown;
+	long				dongle_cooldown;
 	char				*scheduler;
 }						t_config;
 
@@ -61,6 +62,7 @@ typedef struct s_dongle
 	long				released_time;
 	bool				mutex_dongle_initialized;
 	bool				cond_dongle_initialized;
+
 }						t_dongle;
 
 typedef struct s_system

@@ -6,23 +6,20 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:34 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/03 06:16:32 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 03:08:53 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
-void	heap_init(t_heap *heap, int capacity)
+bool	heap_init(t_heap *heap, int capacity)
 {
 	heap->array = malloc(sizeof(t_coder *) * capacity);
 	if (!heap->array)
-	{
-		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES,
-		// SYSTEM
-		return ;
-	}
+		return (false);
 	heap->size = 0;
 	heap->capacity = capacity;
+	return (true);
 }
 
 void	heap_destroy(t_heap *heap)
@@ -59,24 +56,28 @@ void	heap_insert(t_heap *heap, t_coder *coder)
 	heap->size += 1;
 }
 
-t_coder	*heap_pop(t_heap *heap)
+void	ft_swap(t_coder *a, t_coder *b)
 {
-	t_coder			*swap;
-	t_coder			*coder;
-	int				i;
+	t_coder	swap;
+
+	swap = *a;
+	*a = *b;
+	*b = swap;
+}
+
+t_coder	*heap_pop(t_heap *heap, int i, t_coder *coder, int small)
+{
 	unsigned int	left;
 	unsigned int	right;
-	int				small;
 
 	if (heap->size == 0)
 		return (NULL);
 	coder = heap->array[0];
 	heap->size--;
 	heap->array[0] = heap->array[heap->size];
-	i = 0;
-	small = i;
 	while (1)
 	{
+		small = i;
 		left = 2 * i + 1;
 		right = 2 * i + 2;
 		if (left < heap->size
@@ -87,9 +88,7 @@ t_coder	*heap_pop(t_heap *heap)
 			small = right;
 		if (small == i)
 			break ;
-		swap = heap->array[i];
-		heap->array[i] = heap->array[small];
-		heap->array[small] = swap;
+		ft_swap(heap->array[i], heap->array[small]);
 		i = small;
 	}
 	return (coder);

@@ -6,12 +6,12 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/23 17:00:38 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/05 03:47:18 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 03:09:52 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
-
+// »»-----► Number of lines: 38
 void	cleanup_system(t_system *system)
 {
 	unsigned int	i;
@@ -23,7 +23,8 @@ void	cleanup_system(t_system *system)
 		i = 0;
 		while (i < system->config.n_coders)
 		{
-			pthread_mutex_destroy(&system->coders[i].mutex_coder);
+			if (system->coders[i].mutex_coder_initialized)
+				pthread_mutex_destroy(&system->coders[i].mutex_coder);
 			i++;
 		}
 		free(system->coders);
@@ -34,8 +35,10 @@ void	cleanup_system(t_system *system)
 		i = 0;
 		while (i < system->config.n_coders)
 		{
-			pthread_mutex_destroy(&system->dongles[i].mutex_dongle);
-			pthread_cond_destroy(&system->dongles[i].cond_dongle);
+			if (system->dongles[i].mutex_dongle_initialized)
+				pthread_mutex_destroy(&system->dongles[i].mutex_dongle);
+			if (system->dongles[i].cond_dongle_initialized)
+				pthread_cond_destroy(&system->dongles[i].cond_dongle);
 			if (strcmp(system->dongles[i].algo, "fifo") == 0)
 				queue_destroy(&system->dongles[i].fifo);
 			else if (strcmp(system->dongles[i].algo, "edf") == 0)
@@ -45,19 +48,23 @@ void	cleanup_system(t_system *system)
 		free(system->dongles);
 		system->dongles = NULL;
 	}
-	pthread_mutex_destroy(&system->print_mutex);
-	pthread_mutex_destroy(&system->stop_mutex);
+	if (system->print_mutex_initialized)
+		pthread_mutex_destroy(&system->print_mutex);
+	if (system->stop_mutex_initialized)
+		pthread_mutex_destroy(&system->stop_mutex);
 }
-
+// »»-----► Number of lines: 12
 void	join_threads(t_system *system)
 {
 	unsigned int	i;
 
 	i = 0;
-	pthread_join(system->monitor_thread, NULL);
+	if (system->monitor_thread_created)
+		pthread_join(system->monitor_thread, NULL);
 	while (i < system->config.n_coders)
 	{
-		pthread_join(system->coders[i].thread, NULL);
+		if (system->coders[i].thread_created)
+			pthread_join(system->coders[i].thread, NULL);
 		i++;
 	}
 	cleanup_system(system);

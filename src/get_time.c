@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:25 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/05 03:51:32 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 02:13:54 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,10 @@ long	get_time_ms(void)
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000);
 }
 
-
-	long deadline(t_coder * coder)
-	{
-		return (coder->deadline);
-	}
-
+long	deadline(t_coder *coder)
+{
+	return (coder->deadline);
+}
 
 long	get_time(t_system *system)
 {

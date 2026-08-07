@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 14:52:31 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/20 18:11:18 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 02:11:51 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ t_config	ft_get_config(char **arv)
 	data.t_refactor = ft_atoi(arv[5]);
 	data.compiles_required = ft_atoi(arv[6]);
 	data.dongle_cooldown = ft_atoi(arv[7]);
-    data.scheduler = arv[8];
-    
-    return (data);
+	data.scheduler = arv[8];
+	return (data);
 }

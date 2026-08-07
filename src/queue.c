@@ -12,16 +12,14 @@
 
 #include "headers.h"
 
-void	queue_init(t_queue *queue, int capacity)
+bool	queue_init(t_queue *queue, int capacity)
 {
 	queue->array = malloc(sizeof(t_coder *) * capacity);
 	if (!queue->array)
-	{
-		// SHOULD FREE CODERS, FREE DONGLES, DESTROY MUTEXES OF CODERS, DONLES, system and destroy the heap
-		return ;
-	}
+		return (false);
 	queue->size = 0;
 	queue->capacity = capacity;
+	return (true);
 }
 
 void	queue_destroy(t_queue *queue)

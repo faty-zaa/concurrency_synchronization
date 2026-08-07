@@ -6,12 +6,13 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 10:41:42 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/23 16:22:08 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 02:21:50 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
+// »»-----► Number of lines: 26
 int	ft_parsing(int arc, char **arv)
 {
 	int	count_args;
@@ -29,10 +30,7 @@ int	ft_parsing(int arc, char **arv)
 		count_args++;
 	}
 	if (!ft_isalpha(arv[count_args]))
-	{
-		printf("Error: Last argument should be string");
-		return (0);
-	}
+		return (printf("Error: Last argument should be string"), 0);
 	else if ((strcmp("fifo", ft_tolower(arv[count_args])) != 0)
 		&& (strcmp("edf", ft_tolower(arv[count_args])) != 0))
 	{

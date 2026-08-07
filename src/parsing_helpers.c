@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.c                                          :+:      :+:    :+:   */
+/*   parsing_helpers.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/13 18:45:23 by falamlih          #+#    #+#             */
-/*   Updated: 2026/07/19 15:51:37 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 02:13:15 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int	ft_check_args(char **arv, int count)
 		printf("Error: empty sting detected");
 		return (0);
 	}
-	else if(ft_isalpha_num(arv[count]) != strlen(arv[count]))
+	else if (ft_isalpha_num(arv[count]) != strlen(arv[count]))
 	{
 		printf("Error: first 7 arguments should be numbers");
 		return (0);
@@ -108,4 +108,4 @@ int	ft_check_args(char **arv, int count)
 		return (0);
 	}
 	return (1);
-	}
+}

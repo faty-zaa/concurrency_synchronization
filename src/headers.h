@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/05 04:44:52 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 04:22:43 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,9 @@ typedef struct s_dongle
 	t_coder				*current;
 	char				*algo;
 	bool				state;
-	unsigned int released_time;
-
+	long				released_time;
+	bool				mutex_dongle_initialized;
+	bool				cond_dongle_initialized;
 }						t_dongle;
 
 typedef struct s_system
@@ -73,7 +74,9 @@ typedef struct s_system
 	bool				stop;
 	pthread_mutex_t		stop_mutex;
 	char				*scheduler;
-
+	bool				print_mutex_initialized;
+	bool				stop_mutex_initialized;
+	bool				monitor_thread_created;
 }						t_system;
 
 typedef struct s_coder
@@ -89,6 +92,8 @@ typedef struct s_coder
 	t_system			*system;
 	bool				waiting_left;
 	bool				waiting_right;
+	bool				mutex_coder_initialized;
+	bool				thread_created;
 }						t_coder;
 
 int						ft_check_args(char **arv, int count);
@@ -98,8 +103,8 @@ long					ft_atoi(const char *nptr);
 char					*ft_tolower(char *c);
 int						ft_isalpha(char *c);
 size_t					ft_isalpha_num(char *c);
-void					creat_coders(t_system *system);
-void					init_system(t_system *system, t_config *config);
+bool					creat_coders(t_system *system, unsigned int i);
+bool					init_system(t_system *system, t_config *config);
 void					join_threads(t_system *system);
 void					cleanup_system(t_system *system);
 long					get_time_ms(void);
@@ -107,11 +112,12 @@ void					refactoring(t_coder *coder);
 void					debugging(t_coder *coder);
 void					burnout(t_coder *coder);
 long					deadline(t_coder *coder);
-void					heap_init(t_heap *heap, int capacity);
+bool					heap_init(t_heap *heap, int capacity);
 void					heap_destroy(t_heap *heap);
 void					heap_insert(t_heap *heap, t_coder *coder);
-t_coder					*heap_pop(t_heap *heap);
-void					queue_init(t_queue *queue, int capacity);
+t_coder					*heap_pop(t_heap *heap, int i, t_coder *coder,
+							int small);
+bool					queue_init(t_queue *queue, int capacity);
 void					queue_destroy(t_queue *queue);
 void					fifo_enqueue(t_queue *queue, t_coder *coder);
 t_coder					*fifo_deque(t_queue *queue);

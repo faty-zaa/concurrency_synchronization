@@ -6,17 +6,18 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/08 00:44:24 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/08 23:08:29 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
-bool	cooldown_is_done(long released_time, long col)
+bool	cooldown_is_done(t_dongle *dongle, t_system *system)
 {
-	if (released_time == 0)
+	if (dongle->released_time == 0)
 		return (true);
-	return ((get_time_ms() > released_time + col));
+	return (get_time_ms()
+		- dongle->released_time >= (long)system->config.dongle_cooldown);
 }
 
 void	take_dongle(t_dongle *dongle, t_coder *coder, bool *waiting)
@@ -32,26 +33,27 @@ void	take_dongle(t_dongle *dongle, t_coder *coder, bool *waiting)
 	}
 	while (dongle->current != coder && !system_is_stopped(coder->system))
 	{
-		if (dongle->current == NULL && cooldown_is_done(dongle->released_time,
-				coder->system->config.dongle_cooldown))
+		if (dongle->current == NULL && cooldown_is_done(dongle, coder->system))
 		{
 			if (strcmp(coder->system->scheduler, "fifo") == 0)
 				dongle->current = fifo_deque(&dongle->fifo);
 			else
 				dongle->current = heap_pop(&dongle->edf, 0, coder, 0);
-			pthread_cond_broadcast(&dongle->cond_dongle);
 		}
 	}
 	*waiting = false;
 	if (dongle->current != coder)
+	{
+		pthread_cond_broadcast(&dongle->cond_dongle);
 		pthread_mutex_unlock(&dongle->mutex_dongle);
-	return ;
+	}
 }
 
-void	release_dongle(t_dongle *dongle)
+void	release_dongle(t_dongle *dongle, unsigned int rls)
 {
 	dongle->current = NULL;
-	dongle->released_time = get_time_ms();
+	if (rls)
+		dongle->released_time = rls;
 	pthread_cond_broadcast(&dongle->cond_dongle);
 	pthread_mutex_unlock(&dongle->mutex_dongle);
 }
@@ -76,25 +78,28 @@ bool	take_dongles(t_coder *coder)
 		log_print(coder, "has taken a dongle");
 		while (!system_is_stopped(coder->system))
 			pthread_cond_wait(&first->cond_dongle, &first->mutex_dongle);
-		return (release_dongle(first), false);
+		return (release_dongle(first, 0), false);
 	}
 	take_dongle(second, coder, &coder->waiting_right);
 	if (second->current != coder)
-		return (release_dongle(first), false);
+		return (release_dongle(first, 0), false);
 	logs(coder);
 	return (true);
 }
 
 void	compiling(t_coder *coder)
 {
+	unsigned int	rls;
+
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->deadline = get_time_ms() - coder->system->starting_time
 		+ coder->system->config.t_burnout;
 	pthread_mutex_unlock(&coder->mutex_coder);
 	log_print(coder, "is compiling");
 	ft_sleep(get_time_ms() + coder->system->config.t_compile, coder);
-	release_dongle(coder->left);
-	release_dongle(coder->right);
+	rls = get_time_ms();
+	release_dongle(coder->left, rls);
+	release_dongle(coder->right, rls);
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->mutex_coder);

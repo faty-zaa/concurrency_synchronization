@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/26 17:24:08 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/08 04:16:51 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/08 22:20:06 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ void	*monitor(void *arg)
 			wake_all_dongles(system);
 			break ;
 		}
-		wake_all_dongles(system);
 		usleep(1000);
 	}
 	return (NULL);

@@ -1,77 +1,453 @@
-# concurrency_synchronization
-Mastering concurrent programming in C through multithreading, synchronization, shared resource management, and scheduling with POSIX threads
+# Codexion
 
-# Memory in C
+*This project has been created as part of the 42 curriculum by FALAMLIH*
 
-    <The text segment> is usually read-only and stored in the lower part of the memory to prevent accidental modification of the code while the program is running.
+## Description
 
-    <The initialized data segment> is a type of data segment that stores the global and static variables created by the programmer.
+Codexion is a concurrency and synchronization project written in C using POSIX threads.
 
-    <The BSS segment> contains all the global and static variables that are not explicitly initialized by the programmer (or initialized with 0). Since the values of these variables can be modified during program execution, the BSS segment has read-write permission.
-    
-    <The heap> area begins at the end of the BSS segment and grows upward toward higher memory addresses. It is the memory segment used for dynamic memory allocation during program execution. Whenever additional memory is required, functions like malloc() and calloc() allocate space from the heap, causing it to grow upward.
+The project simulates multiple coders working concurrently. Each coder is represented by a thread and needs two shared resources called **dongles** to compile.
 
-    <The stack> is used to manage function calls and local variables. Each time a function is called, a stack frame is created, which stores the function’s local variables, parameters, and return address. When the function finishes, its stack frame is removed, following the LIFO principle.
+The main goal is to learn how to manage multiple threads safely while preventing:
 
-# P_thread
-    Stands for POSIX THREAD
-    is a C library that allowed us the create multiples threads
-    The thread argument points to a buffer of type pthread_t into which the unique identifier for this thread is copied before pthread_create() returns. This identifier can be used in later Pthreads calls to refer to the thread.
-    The pthread_exit() function terminates the calling thread, and specifies a return value that can be obtained in another thread by calling pthread_join().
-    The key difference between threads and processes is the easier sharing of information that threads provide, and this is the main reason that some application designs map better onto a multithread design than onto a multiprocess design.
+* Data races
+* Deadlocks
+* Starvation
+* Race conditions
+* Incorrect resource access
 
-    *terminated thread*: we must ensure that a normally terminating thread does not return an integer whose value matches PTHREAD_CANCELED on that Pthreads implementation.
+The project also implements two scheduling algorithms:
 
-# Mutex
-    pthread_mutex_init() fills the memory occupied by the pthread_mutex_t object with whatever internal data the pthread library needs to make it a valid mutex
-    When an automatically or dynamically allocated mutex is no longer required, it should be destroyed using pthread_mutex_destroy()
-    It is safe to destroy a mutex only when it is unlocked, and no thread will subsequently try to lock it
-    An automatically allocated mutex should be destroyed before its host function returns
-    A mutex that has been destroyed with pthread_mutex_destroy() can subsequently be reinitialized by pthread_mutex_init()
+* **FIFO** — First In, First Out
+* **EDF** — Earliest Deadline First
 
-    
+A monitor thread checks the coders and detects burnout.
 
-Phase 1: Project skeleton
-Phase 2: Argument parser
-Phase 3: Initialization
-Phase 4: Time functions
-Phase 5: Logger
-Phase 6: Heap (Priority Queue)
-Phase 7: Threads
-Phase 8: Dongles
-Phase 9: Scheduler (FIFO)
-Phase 10: Scheduler (EDF)
-Phase 11: Monitor
-Phase 12: Cleanup\
+---
 
-Process
+## Instructions
 
-│
+Compile the project:
 
-├── Machine instructions
+```bash
+make
+```
 
-├── Heap
+Run the program:
 
-├── Stack
+```bash
+./codexion number_of_coders time_to_burnout time_to_compile time_to_debug time_to_refactor number_of_compiles_required dongle_cooldown scheduler
+```
 
-├── Global variables
+Example:
 
-├── Open files
+```bash
+./codexion 3 315 100 100 100 2 5 edf
+```
 
-├── Environment variables
+The arguments are:
 
-├── File descriptors
+| Argument                      | Description                           |
+| ----------------------------- | ------------------------------------- |
+| `number_of_coders`            | Number of coder threads               |
+| `time_to_burnout`             | Maximum time before a coder burns out |
+| `time_to_compile`             | Compilation duration                  |
+| `time_to_debug`               | Debugging duration                    |
+| `time_to_refactor`            | Refactoring duration                  |
+| `number_of_compiles_required` | Required number of compilations       |
+| `dongle_cooldown`             | Dongle cooldown time                  |
+| `scheduler`                   | `fifo` or `edf`                       |
 
-├── Registers
+### Make commands
 
-└── One thread (initially)
+```bash
+make
+```
+
+Compile the project.
+
+```bash
+make clean
+```
+
+Remove object files.
+
+```bash
+make fclean
+```
+
+Remove object files and the executable.
+
+```bash
+make re
+```
+
+Clean and rebuild the project.
+
+---
+
+# Concurrency
+
+Concurrency means that several tasks can make progress during overlapping periods of time.
+
+In this project, every coder is a thread:
+
+```text
+Coder 1 → Thread
+Coder 2 → Thread
+Coder 3 → Thread
+```
+
+All threads belong to the same process and share memory.
+
+Because they share resources, synchronization is required.
+
+---
+
+# Threads
+
+Codexion uses POSIX threads (`pthread`).
+
+The main functions used are:
+
+```c
+pthread_create()
+pthread_join()
+pthread_exit()
+```
+
+`pthread_create()` creates a new thread.
+
+`pthread_join()` waits for a thread to finish.
+
+`pthread_exit()` terminates the calling thread.
+
+---
+
+# Mutexes
+
+A mutex allows only one thread at a time to access protected data.
+
+The main functions are:
+
+```c
+pthread_mutex_init()
+pthread_mutex_lock()
+pthread_mutex_unlock()
+pthread_mutex_destroy()
+```
+
+For example:
+
+```c
+pthread_mutex_lock(&coder->mutex_coder);
+
+/* access shared data */
+
+pthread_mutex_unlock(&coder->mutex_coder);
+```
+
+Mutexes are used to protect shared resources such as:
+
+* Coder state
+* Dongles
+* Scheduler data
+* System state
+* Logs
+
+A mutex must not be destroyed while it is still being used.
+
+---
+
+# Condition Variables
+
+Condition variables allow threads to wait until something changes.
+
+The main functions are:
+
+```c
+pthread_cond_init()
+pthread_cond_wait()
+pthread_cond_signal()
+pthread_cond_broadcast()
+pthread_cond_destroy()
+```
+
+`pthread_cond_wait()` releases the associated mutex while the thread waits.
+
+When the thread wakes up, it automatically reacquires the mutex before returning.
+
+This allows coders to wait for scheduler/resource changes without continuously checking in a loop.
+
+---
+
+# Scheduler
+
+Codexion supports two scheduling algorithms.
+
+## FIFO
+
+FIFO means **First In, First Out**.
+
+The coder that enters the queue first gets priority first.
+
+```text
+Coder 1 → Coder 2 → Coder 3
+   ↓
+First
+```
+
+## EDF
+
+EDF means **Earliest Deadline First**.
+
+The coder with the earliest deadline gets priority.
+
+```text
+Coder 1 → deadline 500
+Coder 2 → deadline 200
+Coder 3 → deadline 350
+```
+
+The order is:
+
+```text
+Coder 2 → Coder 3 → Coder 1
+```
+
+EDF uses a priority queue implemented with a binary min-heap.
+
+---
+
+# Heap
+
+The heap is used by the EDF scheduler.
+
+The smallest deadline is kept at the top of the heap.
+
+Main operations:
+
+```text
+heap_init()
+heap_insert()
+heap_pop()
+heap_destroy()
+```
+
+The main operations have:
+
+* Insert: `O(log n)`
+* Pop: `O(log n)`
+* Get minimum: `O(1)`
+
+---
+
+# Monitor
+
+The monitor is a separate thread that checks the coders.
+
+It checks information such as:
+
+* Last successful compilation
+* Number of compilations
+* Burnout time
+
+The monitor uses the coder mutex when reading shared coder data.
+
+This prevents it from reading data while another thread is modifying it.
+
+When a coder burns out, the monitor requests the system to stop.
+
+---
+
+# Blocking Cases Handled
+
+## Deadlock
+
+A deadlock happens when threads wait for resources held by each other.
+
+For example:
+
+```text
+Coder 1 → owns Dongle 1 → waits for Dongle 2
+Coder 2 → owns Dongle 2 → waits for Dongle 1
+```
+
+Codexion prevents this by controlling the order in which dongles are acquired.
+
+Using a consistent dongle order prevents circular waiting.
+
+## Starvation
+
+Starvation happens when a coder waits for a very long time because other coders continuously get the resources first.
+
+The scheduler controls the order in which coders receive resources.
+
+FIFO provides an arrival-based order, while EDF prioritizes the coder with the earliest deadline.
+
+## Race Conditions
+
+A race condition happens when multiple threads access shared data at the same time and at least one of them modifies it.
+
+Shared data is protected with mutexes.
+
+## Dongle Cooldown
+
+After a dongle is released, the configured cooldown time must be respected before it can be used again.
+
+## Burnout Detection
+
+The monitor checks the time since the coder's last successful compilation.
+
+The coder state is protected by a mutex while it is being read.
+
+## Log Serialization
+
+Multiple threads can print at the same time.
+
+A dedicated print mutex ensures that log messages do not overlap.
+
+---
+
+# Thread Synchronization Mechanisms
+
+Codexion mainly uses:
+
+### `pthread_mutex_t`
+
+Used to protect shared data and resources.
+
+Examples:
+
+```text
+Coder state
+Dongles
+Scheduler
+System stop state
+Logging
+```
+
+### `pthread_cond_t`
+
+Used for communication between threads and for waiting until scheduler conditions change.
+
+### Scheduler synchronization
+
+The scheduler protects its queue/heap so that multiple coder threads cannot modify it simultaneously.
+
+### Monitor synchronization
+
+Coder threads update their state while the monitor reads it.
+
+A mutex ensures that these operations are synchronized.
+
+Example:
+
+```text
+Coder thread
+     │
+     │ updates state
+     ▼
+  Mutex
+     ▲
+     │ reads state
+     │
+ Monitor thread
+```
+
+# Process and Threads
+
+A process contains resources such as:
+
+```text
+Machine instructions
+Heap
+Stack
+Global variables
+File descriptors
+Environment
+Threads
+```
+
+Threads inside the same process share resources such as the heap and global variables.
+
+This makes communication easier but also creates the need for synchronization.
+
+---
+
+# Cleanup
+
+Before destroying shared resources, all threads must finish using them.
+
+A simplified cleanup sequence is:
+
+```text
+Stop system
+    ↓
+Wake waiting threads
+    ↓
+pthread_join()
+    ↓
+Destroy mutexes / conditions
+    ↓
+Free allocated memory
+```
+
+This prevents threads from accessing resources after they have been destroyed.
+
+---
+
+# Testing
+
+Because this is a multithreaded project, synchronization must be tested carefully.
+
+Valgrind can be used to check memory problems:
+
+```bash
+valgrind --leak-check=full ./codexion ...
+```
+
+Helgrind can be used to detect threading problems:
+
+```bash
+valgrind --tool=helgrind ./codexion ...
+```
+
+These tools can help detect:
+
+* Memory leaks
+* Invalid memory accesses
+* Data races
+* Mutex problems
+* Lock-order problems
+
+---
+
+# Resources
+
+* POSIX Threads:
+  https://man7.org/linux/man-pages/man7/pthreads.7.html
+
+* Linux man-pages:
+  https://man7.org/linux/man-pages/
+
+* Linux programming interface:
+    SECTION 30
+https://ia601507.us.archive.org/22/items/linux-programming/the-linux-programming-interface.pdf
 
 
-concurrency: one thread swich between tasks
-parallelism: multi cores has multi threads that excute at the smae time
+---
 
-If all threads only read the data and nobody modifies it, there is no race condition. The problem appears when one or more threads can write to shared data while others access it.
+# AI Usage
 
-cond_wait unlock the mutex taken before
+AI was used as a learning and debugging assistant during the project.
 
-Deadlock happens because threads acquire locks in different orders. Lock ordering forces every thread to acquire locks in the same order, making circular waiting impossible
+It was used for:
+
+* Understanding pthread functions.
+* Understanding mutexes and condition variables.
+* Understanding race conditions and deadlocks.
+* Understanding FIFO and EDF scheduling.
+* Helping with documentation.
+
+The code and final implementation were developed, tested, and adapted according to the project's requirements.

@@ -6,22 +6,18 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 10:41:42 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 02:21:50 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 23:32:52 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
-// »»-----► Number of lines: 26
 int	ft_parsing(int arc, char **arv)
 {
 	int	count_args;
 
 	if (arc < 9 || arc > 9)
-	{
-		printf("Error: requiered 8 args, 7 numbers and one string");
-		return (0);
-	}
+		return (printf("Error: requiered 8 args, 7 numbers and one string"), 0);
 	count_args = 1;
 	while (count_args < arc - 1)
 	{

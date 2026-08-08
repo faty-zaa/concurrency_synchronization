@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:51 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 06:48:36 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 23:25:09 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,23 @@ void	ft_sleep(long ms, t_coder *coder)
 		if (system_is_stopped(coder->system))
 			break ;
 	}
+}
+
+void	system_stop(t_system *system)
+{
+	pthread_mutex_lock(&system->stop_mutex);
+	system->stop = true;
+	pthread_mutex_unlock(&system->stop_mutex);
+}
+
+bool	system_is_stopped(t_system *system)
+{
+	bool	stopped;
+
+	pthread_mutex_lock(&system->stop_mutex);
+	stopped = system->stop;
+	pthread_mutex_unlock(&system->stop_mutex);
+	return (stopped);
 }
 
 void	*simulation(void *args)

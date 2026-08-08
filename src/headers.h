@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 11:53:13 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 05:33:33 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 23:33:59 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,5 +130,14 @@ bool					system_is_stopped(t_system *system);
 void					burnout(t_coder *coder);
 void					*simulation(void *args);
 void					*monitor(void *arg);
+void					ft_sleep(long ms, t_coder *coder);
+void					log_print(t_coder *coder, const char *msg);
+bool					take_dongles(t_coder *coder);
+void					compiling(t_coder *coder);
+bool					alloc_system(t_system *system);
+bool					init_dongle_queue(t_system *system, t_dongle *dongle);
+bool					init_one_dongle(t_system *system, unsigned int i);
+bool					init_dongles(t_system *system);
+void					logs(t_coder *coder);
 
 #endif

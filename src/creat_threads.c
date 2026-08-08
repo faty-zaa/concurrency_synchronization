@@ -6,13 +6,12 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:01:01 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 02:59:39 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 23:30:19 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "headers.h"
 
-// »»-----► Number of lines: 26
 bool	creat_coders(t_system *system, unsigned int i)
 {
 	unsigned int	j;

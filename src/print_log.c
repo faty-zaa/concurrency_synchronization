@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 19:00:43 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 06:49:34 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/08 00:44:24 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,17 +76,12 @@ bool	take_dongles(t_coder *coder)
 		log_print(coder, "has taken a dongle");
 		while (!system_is_stopped(coder->system))
 			pthread_cond_wait(&first->cond_dongle, &first->mutex_dongle);
-		release_dongle(first);
-		return (false);
+		return (release_dongle(first), false);
 	}
 	take_dongle(second, coder, &coder->waiting_right);
 	if (second->current != coder)
-	{
-		release_dongle(first);
-		return (false);
-	}
-	log_print(coder, "has taken a dongle");
-	log_print(coder, "has taken a dongle");
+		return (release_dongle(first), false);
+	logs(coder);
 	return (true);
 }
 

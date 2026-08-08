@@ -6,7 +6,7 @@
 /*   By: falamlih <falamlih@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/12 14:52:31 by falamlih          #+#    #+#             */
-/*   Updated: 2026/08/07 06:50:14 by falamlih         ###   ########.fr       */
+/*   Updated: 2026/08/07 23:31:32 by falamlih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,4 @@ t_config	ft_get_config(char **arv)
 	data.dongle_cooldown = ft_atoi(arv[7]);
 	data.scheduler = arv[8];
 	return (data);
-}
-
-void	refactoring(t_coder *coder)
-{
-	log_print(coder, "is refactoring");
-	ft_sleep(get_time_ms() + coder->system->config.t_refactor, coder);
-}
-
-void	debugging(t_coder *coder)
-{
-	log_print(coder, "is debugging");
-	ft_sleep(get_time_ms() + coder->system->config.t_debug, coder);
-}
-
-void	burnout(t_coder *coder)
-{
-	log_print(coder, "burned out");
 }
